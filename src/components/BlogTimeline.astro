@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PostCard from './PostCard.astro';
+import { formatDate } from '../utils/date';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="blog-timeline">
+  {
+    posts.map((post) => (
+      <article class="blog-timeline-item">
+        <div class="blog-timeline-date">
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+        </div>
+        <div class="blog-timeline-content">
+          <PostCard post={post} />
+        </div>
+      </article>
+    ))
+  }
+</div>

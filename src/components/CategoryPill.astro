@@ -1,0 +1,13 @@
+---
+interface Props {
+  category: string;
+  count?: number;
+}
+
+const { category, count } = Astro.props;
+const href = `/categories/${encodeURIComponent(category)}/`;
+---
+
+<a class="chip" href={href}>
+  {category}{count !== undefined ? ` (${count})` : ''}
+</a>

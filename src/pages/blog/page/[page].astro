@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BlogTimeline from '../../../components/BlogTimeline.astro';
+import BlogSidebar from '../../../components/BlogSidebar.astro';
+import Pagination from '../../../components/Pagination.astro';
+import { POSTS_PER_PAGE } from '../../../consts';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const allPosts = (await getCollection('blog')).filter((post) => !post.data.draft);
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
+  const pages = Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => i + 2);
+  return pages.map((page) => ({
+    params: { page: String(page) },
+    props: { pageNum: page, totalPages },
+  }));
+}
+
+interface Props {
+  pageNum: number;
+  totalPages: number;
+}
+
+const { pageNum, totalPages } = Astro.props;
+const allPosts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = allPosts.slice((pageNum - 1) * POSTS_PER_PAGE, pageNum * POSTS_PER_PAGE);
+---
+
+<BaseLayout title={`博客 · 第 ${pageNum} 页`} description="所有博客文章列表" wide>
+  <div class="blog-layout">
+    <div class="blog-main">
+      <h1 class="page-title">博客</h1>
+      <p class="page-description">第 {pageNum} / {totalPages} 页 · 共 {allPosts.length} 篇文章</p>
+      <BlogTimeline posts={posts} />
+      <Pagination currentPage={pageNum} totalPages={totalPages} />
+    </div>
+    <BlogSidebar />
+  </div>
+</BaseLayout>

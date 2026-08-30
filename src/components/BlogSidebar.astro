@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import CategoryPill from './CategoryPill.astro';
+import TagPill from './TagPill.astro';
+
+const posts = (await getCollection('blog')).filter((post) => !post.data.draft);
+
+const categoryCounts = new Map<string, number>();
+const tagCounts = new Map<string, number>();
+
+for (const post of posts) {
+  const category = post.data.category;
+  categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
+  for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+
+const categories = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-CN'));
+const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-CN')).slice(0, 20);
+---
+
+<aside class="blog-aside">
+  <div class="card blog-aside-section">
+    <h3 class="blog-aside-title">分类</h3>
+    {
+      categories.length > 0 ? (
+        <div class="blog-aside-tags">
+          {categories.map(([category, count]) => <CategoryPill category={category} count={count} />)}
+        </div>
+      ) : (
+        <p class="home-empty">暂无分类</p>
+      )
+    }
+  </div>
+
+  <div class="card blog-aside-section">
+    <h3 class="blog-aside-title">标签</h3>
+    {
+      tags.length > 0 ? (
+        <div class="blog-aside-tags">
+          {tags.map(([tag, count]) => <TagPill tag={tag} count={count} />)}
+        </div>
+      ) : (
+        <p class="home-empty">暂无标签</p>
+      )
+    }
+  </div>
+</aside>

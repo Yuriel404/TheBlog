@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatShortDate } from '../utils/date';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.pubDate.getFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" description="按时间归档所有文章">
+  <div class="content-panel">
+    <h1 class="page-title">归档</h1>
+    <p class="page-description">共 {posts.length} 篇文章</p>
+    {
+      years.length > 0 ? (
+        years.map((year) => (
+          <section>
+            <h2 class="archive-year">{year}</h2>
+            <ul class="archive-list">
+              {byYear.get(year)!.map((post) => (
+                <li>
+                  <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate)}</time>
+                  <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      ) : (
+        <div class="empty">还没有文章。</div>
+      )
+    }
+  </div>
+</BaseLayout>

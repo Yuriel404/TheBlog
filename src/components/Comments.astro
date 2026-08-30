@@ -1,0 +1,51 @@
+---
+import { giscusConfig } from '../data/comments';
+
+const enabled = Boolean(
+  giscusConfig.repo &&
+  giscusConfig.repoId &&
+  giscusConfig.category &&
+  giscusConfig.categoryId
+);
+---
+
+<section class="comments">
+  <h2 class="section-title">评论</h2>
+  {
+    enabled ? (
+      <div class="giscus" id="giscus-comments"></div>
+    ) : (
+      <div class="empty">
+        评论功能未配置。请在 <code>src/data/comments.ts</code> 中填写 Giscus 配置。
+      </div>
+    )
+  }
+</section>
+
+{
+  enabled && (
+    <script is:inline define:vars={{ giscusConfig }}>
+      (() => {
+        const container = document.getElementById('giscus-comments');
+        if (!container) return;
+        const script = document.createElement('script');
+        script.src = 'https://giscus.app/client.js';
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        script.setAttribute('data-repo', giscusConfig.repo);
+        script.setAttribute('data-repo-id', giscusConfig.repoId);
+        script.setAttribute('data-category', giscusConfig.category);
+        script.setAttribute('data-category-id', giscusConfig.categoryId);
+        script.setAttribute('data-mapping', giscusConfig.mapping);
+        script.setAttribute('data-strict', '0');
+        script.setAttribute('data-reactions-enabled', giscusConfig.reactionsEnabled);
+        script.setAttribute('data-emit-metadata', giscusConfig.emitMetadata);
+        script.setAttribute('data-input-position', 'top');
+        script.setAttribute('data-theme', giscusConfig.theme);
+        script.setAttribute('data-lang', giscusConfig.lang);
+        script.setAttribute('data-loading', giscusConfig.loading);
+        container.appendChild(script);
+      })();
+    </script>
+  )
+}

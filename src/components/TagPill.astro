@@ -1,0 +1,13 @@
+---
+interface Props {
+  tag: string;
+  count?: number;
+}
+
+const { tag, count } = Astro.props;
+const href = `/tags/${encodeURIComponent(tag)}/`;
+---
+
+<a class="tag" href={href}>
+  {tag}{count !== undefined ? ` (${count})` : ''}
+</a>

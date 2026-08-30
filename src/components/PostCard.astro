@@ -1,0 +1,34 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../utils/date';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  showExcerpt?: boolean;
+}
+
+const { post, showExcerpt = true } = Astro.props;
+const { title, description, pubDate, tags, category, featured } = post.data;
+---
+
+<article class="post-card">
+  <a class="post-card-link" href={`/blog/${post.id}/`} aria-label={title} aria-hidden="true" tabindex="-1"></a>
+  <h2>
+    {featured && <span class="post-featured-badge">⭐ 精选</span>}
+    <a class="post-card-title" href={`/blog/${post.id}/`}>{title}</a>
+  </h2>
+  <div class="post-meta">
+    <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+    {category && <span> · {category}</span>}
+  </div>
+  {showExcerpt && description && <p>{description}</p>}
+  {
+    tags.length > 0 && (
+      <div class="tags" style="margin-top: 0.75rem">
+        {tags.map((tag) => (
+          <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>{tag}</a>
+        ))}
+      </div>
+    )
+  }
+</article>

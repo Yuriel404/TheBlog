@@ -1,0 +1,19 @@
+---
+const { bgcolor = "#dde9e0", bordercolor = "#5cb85c" } = Astro.props;
+---
+
+<style define:vars={{ bgcolor, bordercolor }}>
+    div.note {
+        box-sizing: border-box;
+        background-color: var(--bgcolor);
+        padding: 12px;
+        border-radius: 6px;
+        border-left-color: var(--bordercolor);
+        border-left-width: 5.6px;
+        border-left-style: solid;
+    }
+</style>
+
+<div class="note">
+    <slot />
+</div>

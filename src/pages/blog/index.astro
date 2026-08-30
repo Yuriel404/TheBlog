@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogTimeline from '../../components/BlogTimeline.astro';
+import BlogSidebar from '../../components/BlogSidebar.astro';
+import Pagination from '../../components/Pagination.astro';
+import { POSTS_PER_PAGE } from '../../consts';
+import { getCollection } from 'astro:content';
+
+const allPosts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
+const posts = allPosts.slice(0, POSTS_PER_PAGE);
+---
+
+<BaseLayout title="博客" description="所有博客文章列表" wide>
+  <div class="blog-layout">
+    <div class="blog-main">
+      <h1 class="page-title">博客</h1>
+      <p class="page-description">共 {allPosts.length} 篇文章</p>
+      {
+        posts.length > 0 ? (
+          <>
+            <BlogTimeline posts={posts} />
+            <Pagination currentPage={1} totalPages={totalPages} />
+          </>
+        ) : (
+          <div class="empty">还没有文章。</div>
+        )
+      }
+    </div>
+    <BlogSidebar />
+  </div>
+</BaseLayout>

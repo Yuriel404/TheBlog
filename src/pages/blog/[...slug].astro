@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagPill from '../../components/TagPill.astro';
+import CategoryPill from '../../components/CategoryPill.astro';
+import ArticleToc from '../../components/ArticleToc.astro';
+import Copyright from '../../components/Copyright.astro';
+import PostNavigation from '../../components/PostNavigation.astro';
+import Comments from '../../components/Comments.astro';
+import { getCollection, render } from 'astro:content';
+import { formatDate } from '../../utils/date';
+import { getReadingStats } from '../../utils/reading';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts
+    .filter((post) => !post.data.draft)
+    .map((post) => ({
+      params: { slug: post.id },
+      props: { post },
+    }));
+}
+
+interface Props {
+  post: Awaited<ReturnType<typeof getCollection>>[number];
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 6);
+const { title, description, pubDate, updatedDate, category, tags } = post.data;
+const { words, minutes } = getReadingStats(post.body ?? '');
+
+const allPosts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const currentIndex = allPosts.findIndex((p) => p.id === post.id);
+const olderPost = currentIndex >= 0 && currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+---
+
+<BaseLayout title={title} description={description} banner={post.data.heroImage} bannerTitle={title} bannerSubtitle={formatDate(pubDate)} articleDate={pubDate} articleModified={updatedDate} articleImage={post.data.heroImage} wide>
+  <div class:list={['article-layout', { 'article-layout--no-toc': tocHeadings.length === 0 }]}>
+    <ArticleToc headings={tocHeadings} />
+    <article class="article-main">
+      <header style="margin-bottom: 2rem">
+        <h1 class="page-title">{title}</h1>
+        <p class="page-description" style="margin-bottom: 0.75rem">
+          <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+          {updatedDate && (
+            <>
+              {' '}· 更新于 <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+            </>
+          )}
+          {category && (
+            <>
+              {' '}· <CategoryPill category={category} />
+            </>
+          )}
+          <span> · {minutes} 分钟 · {words} 字</span>
+        </p>
+        {
+          tags.length > 0 && (
+            <div class="tags">
+              {tags.map((tag) => <TagPill tag={tag} />)}
+            </div>
+          )
+        }
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+
+      <Copyright title={title} date={pubDate} />
+      <PostNavigation prev={olderPost} next={newerPost} />
+      <Comments />
+    </article>
+  </div>
+</BaseLayout>

@@ -1,0 +1,168 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import TagPill from "../components/TagPill.astro";
+import CategoryPill from "../components/CategoryPill.astro";
+import { getCollection } from "astro:content";
+import { siteConfig } from "../data/site";
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const featuredPosts = posts.filter((post) => post.data.featured).slice(0, 3);
+
+const tagCounts = new Map<string, number>();
+const categoryCounts = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+  const category = post.data.category;
+  categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
+}
+
+const topTags = [...tagCounts.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 12);
+const topCategories = [...categoryCounts.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 12);
+
+const initialCount = 5;
+const pageSize = 5;
+---
+
+<BaseLayout wide>
+  <div class="home-layout">
+    <aside class="home-sidebar">
+      <div class="card home-profile">
+        <img
+          class="home-avatar"
+          src={siteConfig.avatar}
+          alt={siteConfig.author}
+        />
+        <h2 class="home-name">{siteConfig.author}</h2>
+        <p class="home-bio">{siteConfig.description}</p>
+      </div>
+
+      <div class="card home-section">
+        <h3 class="home-sidebar-title">分类</h3>
+        {
+          topCategories.length > 0 ? (
+            <div class="home-tags">
+              {topCategories.map(([category, count]) => (
+                <CategoryPill category={category} count={count} />
+              ))}
+            </div>
+          ) : (
+            <p class="home-empty">暂无分类</p>
+          )
+        }
+      </div>
+
+      <div class="card home-section">
+        <h3 class="home-sidebar-title">标签</h3>
+        {
+          topTags.length > 0 ? (
+            <div class="home-tags">
+              {topTags.map(([tag, count]) => (
+                <TagPill tag={tag} count={count} />
+              ))}
+            </div>
+          ) : (
+            <p class="home-empty">暂无标签</p>
+          )
+        }
+      </div>
+    </aside>
+
+    <div class="home-main">
+      {
+        featuredPosts.length > 0 && (
+          <>
+            <h2 class="section-title">⭐ 精选文章</h2>
+            <div class="post-list">
+              {featuredPosts.map((post) => <PostCard post={post} />)}
+            </div>
+          </>
+        )
+      }
+
+      <h2 class="section-title">全部文章</h2>
+      {
+        posts.length > 0 ? (
+          <>
+            <div class="post-list" id="home-post-list">
+              {posts.map((post, index) => (
+                <div
+                  class:list={[
+                    "home-post-item",
+                    { "is-hidden": index >= initialCount },
+                  ]}
+                >
+                  <PostCard post={post} />
+                </div>
+              ))}
+            </div>
+            <div id="home-post-sentinel" aria-hidden="true" />
+          </>
+        ) : (
+          <div class="empty">
+            还没有文章，去 <code>src/content/blog</code> 添加第一篇吧。
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<noscript>
+  <style>
+    .home-post-item.is-hidden {
+      display: block !important;
+    }
+  </style>
+</noscript>
+
+<script is:inline>
+  (() => {
+    const list = document.getElementById("home-post-list");
+    const sentinel = document.getElementById("home-post-sentinel");
+    if (!list || !sentinel) return;
+
+    const items = Array.from(list.children);
+    const initialCount = 5;
+    const pageSize = 5;
+    let visibleCount = initialCount;
+
+    function showNext() {
+      const next = Math.min(visibleCount + pageSize, items.length);
+      for (let i = visibleCount; i < next; i++) {
+        items[i].classList.remove("is-hidden");
+      }
+      visibleCount = next;
+      if (visibleCount >= items.length) {
+        sentinel.style.display = "none";
+      }
+    }
+
+    if (items.length <= initialCount) {
+      sentinel.style.display = "none";
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          showNext();
+        }
+      },
+      {
+        rootMargin: "200px",
+      },
+    );
+
+    observer.observe(sentinel);
+  })();
+</script>

@@ -1,0 +1,31 @@
+---
+import { siteConfig } from '../data/site';
+
+const pathname = Astro.url.pathname;
+const navItems = siteConfig.nav.filter((item) => item.href !== '/search');
+---
+
+<header class="site-header">
+  <div class="container">
+    <a class="site-title" href="/">{siteConfig.title}</a>
+    <nav class="site-nav" aria-label="主导航">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            aria-current={pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)) ? 'page' : undefined}
+          >
+            {item.title}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="site-actions">
+      <button type="button" class="nav-search-bar" data-open-search aria-label="打开搜索">
+        <span class="nav-search-icon">🔍</span>
+        <span class="nav-search-text">搜索</span>
+        <span class="nav-search-kbd">Ctrl K</span>
+      </button>
+    </div>
+  </div>
+</header>

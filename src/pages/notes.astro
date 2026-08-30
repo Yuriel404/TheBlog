@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TagPill from '../components/TagPill.astro';
+import { getCollection, render } from 'astro:content';
+import { formatDate } from '../utils/date';
+
+const notes = (await getCollection('notes'))
+  .filter((note) => !note.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const renderedNotes = [];
+for (const note of notes) {
+  try {
+    const { Content } = await render(note);
+    renderedNotes.push({ note, Content });
+  } catch (error) {
+    console.error(`Failed to render note: ${note.id}`, error);
+  }
+}
+
+const initialCount = 5;
+const pageSize = 5;
+---
+
+<BaseLayout title="碎言" description="记录平时的短小文字" wide>
+  <h1 class="page-title">碎言</h1>
+  <p class="page-description">一些短小、零碎的生活记录与想法</p>
+
+  {
+    renderedNotes.length > 0 ? (
+      <>
+        <div class="blog-timeline" id="notes-list">
+          {renderedNotes.map(({ note, Content }, index) => (
+            <article class:list={['blog-timeline-item', { 'is-hidden': index >= initialCount }]}>
+              <div class="blog-timeline-date">
+                <time datetime={note.data.date.toISOString()}>{formatDate(note.data.date)}</time>
+              </div>
+              <div class="blog-timeline-content notes-content" id={note.id}>
+                {note.data.title && <h2 class="notes-title">{note.data.title}</h2>}
+                <div class="prose notes-prose">
+                  <Content />
+                </div>
+                {
+                  note.data.tags.length > 0 && (
+                    <div class="tags" style="margin-top: 0.75rem">
+                      {note.data.tags.map((tag) => <TagPill tag={tag} />)}
+                    </div>
+                  )
+                }
+              </div>
+            </article>
+          ))}
+        </div>
+        <div id="notes-sentinel" aria-hidden="true"></div>
+      </>
+    ) : (
+      <div class="empty">还没有碎碎念。</div>
+    )
+  }
+</BaseLayout>
+
+<noscript>
+  <style>
+    .blog-timeline-item.is-hidden {
+      display: block !important;
+    }
+  </style>
+</noscript>
+
+<script is:inline>
+  (() => {
+    const list = document.getElementById('notes-list');
+    const sentinel = document.getElementById('notes-sentinel');
+    if (!list || !sentinel) return;
+
+    const items = Array.from(list.children);
+    const initialCount = 5;
+    const pageSize = 5;
+    let visibleCount = initialCount;
+
+    function showNext() {
+      const next = Math.min(visibleCount + pageSize, items.length);
+      for (let i = visibleCount; i < next; i++) {
+        items[i].classList.remove('is-hidden');
+      }
+      visibleCount = next;
+      if (visibleCount >= items.length) {
+        sentinel.style.display = 'none';
+      }
+    }
+
+    if (items.length <= initialCount) {
+      sentinel.style.display = 'none';
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        showNext();
+      }
+    }, {
+      rootMargin: '200px',
+    });
+
+    observer.observe(sentinel);
+  })();
+</script>

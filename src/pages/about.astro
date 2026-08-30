@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SocialIcon from "../components/SocialIcon.astro";
+import { siteConfig } from "../data/site";
+---
+
+<BaseLayout title="关于" description="关于我">
+  <div class="about-page">
+    <section class="about-hero">
+      <div class="about-identity">
+        <div class="about-avatar-wrap">
+          <img
+            class="about-avatar"
+            src={siteConfig.avatar}
+            alt={siteConfig.author}
+          />
+        </div>
+        <h1 class="about-name">
+          <span class="about-name-main">{siteConfig.author}</span>
+          <span class="about-name-alias">羽逸</span>
+        </h1>
+      </div>
+      <p class="about-slogan">是修学通信工程的人类</p>
+      <p class="about-slogan">对软件、音乐等不是主线的东西也很感兴趣</p>
+      <p class="about-slogan">希望可以逐渐修炼成满级人类 qwq</p>
+    </section>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <h2>🧑‍💻 这个站点</h2>
+        <p>
+          泥豪，欢迎来到 {siteConfig.author} 的小窝。 在这里主要分享技术学习笔记、日常思考和生活记录。
+        </p>
+      </div>
+
+      <div class="about-card">
+        <h2>🎯 兴趣</h2>
+        <ul class="about-list">
+          <li>软件 / 硬件</li>
+          <li>音乐</li>
+          <li>ACG 与二次元</li>
+          <li>胡思乱想</li>
+        </ul>
+      </div>
+
+      <div class="about-card">
+        <h2>📮 联系方式</h2>
+        <p>欢迎通过以下方式联系我：</p>
+        <div class="about-contact">
+          {
+            siteConfig.social.map((s) => (
+              <a
+                class="about-contact-icon"
+                href={s.href}
+                target="_blank"
+                rel="noopener"
+                aria-label={s.title}
+              >
+                <SocialIcon name={s.title} />
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

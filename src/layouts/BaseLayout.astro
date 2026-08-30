@@ -1,0 +1,138 @@
+---
+import { siteConfig } from '../data/site';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ParticleBackground from '../components/ParticleBackground.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import BackToTop from '../components/BackToTop.astro';
+import SearchModal from '../components/SearchModal.astro';
+import ImageLightbox from '../components/ImageLightbox.astro';
+import CodeCopyButton from '../components/CodeCopyButton.astro';
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  banner?: string;
+  bannerTitle?: string;
+  bannerSubtitle?: string;
+  articleDate?: Date;
+  articleModified?: Date;
+  articleImage?: string;
+  wide?: boolean;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  image = siteConfig.avatar,
+  banner,
+  bannerTitle,
+  bannerSubtitle,
+  articleDate,
+  articleModified,
+  articleImage,
+  wide = false,
+} = Astro.props;
+
+const pageTitle = title === siteConfig.title ? siteConfig.title : `${title} · ${siteConfig.title}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? siteConfig.site);
+const pathname = Astro.url.pathname;
+const isArticle = pathname.startsWith('/blog/') && pathname !== '/blog/' && !pathname.startsWith('/blog/page/');
+---
+
+<!doctype html>
+<html lang={siteConfig.language}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="author" content={siteConfig.author} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteConfig.title,
+      url: siteConfig.site,
+    })} />
+    {
+      articleDate && (
+        <script type="application/ld+json" set:html={JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: title,
+          description: description,
+          datePublished: articleDate.toISOString(),
+          dateModified: (articleModified ?? articleDate).toISOString(),
+          author: {
+            '@type': 'Person',
+            name: siteConfig.author,
+            url: `${siteConfig.site}/about`,
+          },
+          publisher: {
+            '@type': 'Person',
+            name: siteConfig.author,
+          },
+          mainEntityOfPage: canonicalURL.toString(),
+          image: articleImage ? new URL(articleImage, siteConfig.site).toString() : undefined,
+        })} />
+      )
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, siteConfig.site)} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary" />
+    <title>{pageTitle}</title>
+    <link rel="alternate" type="application/rss+xml" title={siteConfig.title} href="/rss.xml" />
+  </head>
+  <body>
+    <ParticleBackground />
+    {isArticle && <ReadingProgress />}
+    <Header />
+    <main class:list={['main', { 'main--with-banner': Boolean(banner) }]}>
+      {
+        banner && (
+          <div class="page-banner" id="page-banner">
+            <img src={banner} alt="" />
+            <div class="page-banner-overlay" aria-hidden="true"></div>
+            <div class="page-banner-content">
+              <p class="page-banner-eyebrow">{siteConfig.title}</p>
+              <h2 class="page-banner-title">{bannerTitle ?? title}</h2>
+              {bannerSubtitle && <p class="page-banner-subtitle">{bannerSubtitle}</p>}
+            </div>
+          </div>
+        )
+      }
+      <div class:list={['container', { 'container--wide': wide }]}>
+        <slot />
+      </div>
+    </main>
+    {
+      banner && (
+        <script is:inline>
+          (() => {
+            const banner = document.getElementById('page-banner');
+            if (!banner) return;
+            const update = () => {
+              const opacity = Math.max(0, 1 - window.scrollY / 300);
+              banner.style.opacity = String(opacity);
+            };
+            window.addEventListener('scroll', update, { passive: true });
+            update();
+          })();
+        </script>
+      )
+    }
+    <Footer />
+    {isArticle && <BackToTop />}
+    <SearchModal />
+    <ImageLightbox />
+    <CodeCopyButton />
+  </body>
+</html>

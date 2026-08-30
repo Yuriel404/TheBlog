@@ -1,0 +1,305 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const searchIndex = posts.map((post) => ({
+  title: post.data.title,
+  description: post.data.description ?? '',
+  tags: post.data.tags,
+  category: post.data.category,
+  url: `/blog/${post.id}/`,
+  date: post.data.pubDate.toISOString(),
+}));
+---
+
+<div id="search-modal" class="search-modal" aria-hidden="true">
+  <div class="search-modal-backdrop" data-search-close></div>
+  <div class="search-modal-panel" role="dialog" aria-modal="true" aria-label="搜索文章">
+    <div class="search-modal-header">
+      <input id="search-modal-input" type="search" placeholder="输入关键词搜索文章…" autocomplete="off" />
+      <button type="button" class="search-modal-close" data-search-close>ESC</button>
+    </div>
+    <div id="search-modal-results" class="search-modal-results"></div>
+    <div id="search-modal-empty" class="search-modal-empty">没有匹配的文章</div>
+  </div>
+</div>
+
+<style is:global>
+  .search-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 12vh 1rem 2rem;
+  }
+
+  .search-modal.open {
+    display: flex;
+  }
+
+  .search-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(15 23 42 / 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  .search-modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 0.18);
+    overflow: hidden;
+  }
+
+  .search-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+  }
+
+  .search-modal-header input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 1rem;
+    padding: 0.4rem 0.2rem;
+  }
+
+  .search-modal-close {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
+
+  .search-modal-results {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .search-modal-empty {
+    display: none;
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  .search-modal-empty.show {
+    display: block;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    background: linear-gradient(135deg, var(--bg), var(--bg-soft));
+    box-shadow: 0 2px 8px rgb(59 130 246 / 0.06);
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  .search-result-item:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    box-shadow: 0 6px 20px rgb(59 130 246 / 0.15);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .search-result-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .search-result-item h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.5;
+    transition: color 0.2s;
+  }
+
+  .search-result-item:hover h3 {
+    color: var(--primary);
+  }
+
+  .search-result-item p {
+    margin: 0.3rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .search-result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+
+  .search-result-category {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .search-result-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .search-result-tag {
+    display: inline-block;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .search-result-arrow {
+    flex-shrink: 0;
+    color: var(--primary);
+    font-size: 1.2rem;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .search-result-item:hover .search-result-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>
+
+<script is:inline define:vars={{ searchIndex }}>
+  (() => {
+    const modal = document.getElementById('search-modal');
+    const input = document.getElementById('search-modal-input');
+    const results = document.getElementById('search-modal-results');
+    const empty = document.getElementById('search-modal-empty');
+    if (!modal || !input || !results || !empty) return;
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[c]));
+    }
+
+    function render(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        results.innerHTML = '';
+        empty.classList.remove('show');
+        return;
+      }
+
+      const matched = searchIndex.filter((post) => {
+        const haystack = [post.title, post.description, post.category, ...post.tags].join(' ').toLowerCase();
+        return haystack.includes(q);
+      });
+
+      results.innerHTML = matched.map((post) => `
+        <a class="search-result-item" href="${escapeHtml(post.url)}">
+          <div class="search-result-body">
+            <h3>${escapeHtml(post.title)}</h3>
+            ${post.description ? `<p>${escapeHtml(post.description)}</p>` : ''}
+            <div class="search-result-meta">
+              <span class="search-result-date">${new Date(post.date).toLocaleDateString('zh-CN')}</span>
+              <span class="search-result-category">${escapeHtml(post.category)}</span>
+              <span class="search-result-tags">${post.tags.map((tag) => `<span class="search-result-tag">${escapeHtml(tag)}</span>`).join('')}</span>
+            </div>
+          </div>
+          <span class="search-result-arrow">→</span>
+        </a>
+      `).join('');
+
+      empty.classList.toggle('show', matched.length === 0);
+    }
+
+    function openSearch() {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      input.value = '';
+      render('');
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeSearch() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    window.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openSearch();
+      }
+      if (event.key === 'Escape' && modal.classList.contains('open')) {
+        closeSearch();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('[data-open-search]')) {
+        event.preventDefault();
+        openSearch();
+      }
+      if (event.target.closest('[data-search-close]')) {
+        closeSearch();
+      }
+    });
+
+    input.addEventListener('input', () => render(input.value));
+
+    results.addEventListener('click', (event) => {
+      if (event.target.closest('a')) {
+        closeSearch();
+      }
+    });
+  })();
+</script>

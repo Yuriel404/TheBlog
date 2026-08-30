@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  prev: CollectionEntry<'blog'> | null;
+  next: CollectionEntry<'blog'> | null;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="post-navigation" aria-label="文章导航">
+      {
+        prev ? (
+          <a class="post-nav-card" href={`/blog/${prev.id}/`}>
+            <span class="post-nav-label">← 上一篇</span>
+            <span class="post-nav-title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span class="post-nav-card post-nav-card--empty"></span>
+        )
+      }
+      {
+        next ? (
+          <a class="post-nav-card post-nav-card--next" href={`/blog/${next.id}/`}>
+            <span class="post-nav-label">下一篇 →</span>
+            <span class="post-nav-title">{next.data.title}</span>
+          </a>
+        ) : (
+          <span class="post-nav-card post-nav-card--empty"></span>
+        )
+      }
+    </nav>
+  )
+}

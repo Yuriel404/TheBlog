@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { friendLinks } from '../data/links';
+
+---
+
+<BaseLayout title="友链" description="我的朋友和优质网站">
+  <h1 class="page-title">友链</h1>
+  <p class="page-description">这些是朋友和值得推荐的网站。</p>
+
+  {
+    friendLinks.length > 0 ? (
+      <div class="grid">
+        {friendLinks.map((link) => (
+          <a class="card link-card" href={link.url} target="_blank" rel="noopener">
+            {link.avatar && <img src={link.avatar} alt={`${link.name} 头像`} loading="lazy" />}
+            <div class="link-info">
+              <div class="link-name">{link.name}</div>
+              <div class="link-desc">{link.description}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="empty">还没有友链，期待你的加入。</div>
+    )
+  }
+
+</BaseLayout>
