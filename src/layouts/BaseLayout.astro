@@ -8,8 +8,10 @@ import BackToTop from '../components/BackToTop.astro';
 import SearchModal from '../components/SearchModal.astro';
 import ImageLightbox from '../components/ImageLightbox.astro';
 import CodeCopyButton from '../components/CodeCopyButton.astro';
-import 'katex/dist/katex.min.css';
 import '../styles/global.css';
+
+import '@fontsource/noto-sans-sc/400.css';  // 常规
+import '@fontsource/noto-sans-sc/700.css';  // 粗体（标题用）
 
 interface Props {
   title?: string;
