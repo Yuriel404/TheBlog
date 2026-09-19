@@ -75,6 +75,12 @@ npm run preview
 └── tsconfig.json
 ```
 
+## 自动部署
+
+仓库包含 GitHub Actions workflow：推送到 `main` 后自动构建，并通过 SSH + rsync
+同步到 1Panel / OpenResty 的博客目录。首次使用需配置 SSH 密钥和仓库 Secrets，详见
+[自动部署指南](docs/deployment.md)。
+
 ## 自定义
 
 1. 修改 `src/data/site.ts` 中的站点标题、作者、导航、社交链接。

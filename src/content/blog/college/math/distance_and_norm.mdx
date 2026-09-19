@@ -1,7 +1,7 @@
 ---
 title: '距离和范数'
 description: ''
-pubDate: 2026-08-25
+pubDate: 2026-09-17
 category: '数学'
 tags: ['math']
 draft: false
@@ -37,11 +37,22 @@ $$
 
 对于 $1 \leq p \lt \infty$, 记
 $$
-l^p=\left\{ \boldsymbol{x} : \boldsymbol{x} = (x_1, x_2, \cdots, x_i, \cdots)^\mathrm{T}, \sum_{i=1}^{\infty} \vert x_i \vert ^p \lt \infty \right\}.
+\begin{array}{c}
+    l^p=\left\{ \boldsymbol{x} : \boldsymbol{x} = (x_1, x_2, \cdots, x_i, \cdots)^\mathrm{T}, \sum_{i=1}^{\infty} \vert x_i \vert ^p \lt \infty \right\}, \\
+    l^\infty=\left\{ \boldsymbol{x} : \boldsymbol{x} = (x_1, x_2, \cdots, x_i, \cdots)^\mathrm{T}, \sup_{i} \vert x_i \vert \lt \infty \right\},
+\end{array}
 $$
 定义
 $$
-d_p(\boldsymbol{x},\boldsymbol{y}) =\left\{ \sum_{i=1}^{\infty} {\vert x_i - y_i \vert ^p} \right\} ^{1/p},
+\begin{array}{c}
+    d_p(\boldsymbol{x},\boldsymbol{y}) =\left\{ \sum_{i=1}^{\infty} {\vert x_i - y_i \vert ^p} \right\} ^{1/p}, \\
+    d_\infty(\boldsymbol{x},\boldsymbol{y}) = \sup_{i} \vert x_i - y_i \vert ,
+\end{array}
 $$
 
-那么有 $(l^p, d_p)$ 是距离空间. 
+那么 $(l^p, d_p)$ 和 $(l^\infty, d_\infty)$ 都是距离空间. 
+
+### 距离空间上的极限概念
+
+类似于实数集 $\mathbb{R}$ 上的数列极限概念，距离空间上也有类似的极限概念
+
