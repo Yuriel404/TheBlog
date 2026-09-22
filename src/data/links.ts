@@ -16,6 +16,6 @@ export const friendLinks: FriendLink[] = [
     name: 'Evigila的博客',
     url: 'https://blog.evigila.net/',
     avatar: 'https://blog.evigila.net/avatar.jpg',
-    description: 'Evigila的博客',
+    description: '喵喵喵',
   },
 ];
