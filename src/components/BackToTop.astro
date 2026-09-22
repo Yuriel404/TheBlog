@@ -1,4 +1,8 @@
-<button id="back-to-top" type="button" aria-label="回到顶部">↑</button>
+<button id="back-to-top" type="button" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 4 4.5 11.5h4.25V20h6.5v-8.5h4.25L12 4Z" />
+  </svg>
+</button>
 
 <style>
   #back-to-top {
@@ -7,12 +11,13 @@
     bottom: 1.25rem;
     width: 42px;
     height: 42px;
+    display: grid;
+    place-items: center;
+    padding: 0;
     border: none;
     border-radius: 50%;
     background: linear-gradient(135deg, #3b82f6, #60a5fa);
     color: #fff;
-    font-size: 1.2rem;
-    line-height: 1;
     cursor: pointer;
     box-shadow: 0 6px 20px rgb(59 130 246 / 0.35);
     opacity: 0;
@@ -20,6 +25,12 @@
     transform: translateY(10px);
     transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
     z-index: 1000;
+  }
+
+  #back-to-top svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
   }
 
   #back-to-top.visible {

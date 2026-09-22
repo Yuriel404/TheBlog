@@ -53,8 +53,8 @@ const isArticle = pathname.startsWith('/blog/') && pathname !== '/blog/' && !pat
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <meta name="author" content={siteConfig.author} />
-    <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />
-    <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg" />
+    <!-- <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" /> -->
+    <link rel="icon" type="image/svg+xml" sizes="any" href="https://q1.qlogo.cn/g?b=qq&nk=3138947771&s=100" />
     <link rel="canonical" href={canonicalURL} />
     <script type="application/ld+json" set:html={JSON.stringify({
       '@context': 'https://schema.org',
@@ -112,7 +112,7 @@ const isArticle = pathname.startsWith('/blog/') && pathname !== '/blog/' && !pat
           </div>
         )
       }
-      <div class:list={['container', { 'container--wide': wide }]}>
+      <div class:list={['container', { 'container--wide': wide, 'container--article': isArticle }]}>
         <slot />
       </div>
     </main>
