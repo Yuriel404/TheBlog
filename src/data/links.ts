@@ -12,4 +12,10 @@ export const friendLinks: FriendLink[] = [
     avatar: 'https://raku404.com/assets/img/icon.png',
     description: '羽梦千景的小站',
   },
+  {
+    name: 'Evigila的博客',
+    url: 'https://blog.evigila.net/',
+    avatar: 'https://blog.evigila.net/avatar.jpg',
+    description: 'Evigila的博客',
+  },
 ];
