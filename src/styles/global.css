@@ -391,14 +391,6 @@ main.main--with-banner {
   -webkit-overflow-scrolling: touch;
 }
 
-.prose mjx-container[jax='SVG']:not([display='true']) {
-  display: inline-block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  vertical-align: middle;
-}
-
 .prose h1,
 .prose h2,
 .prose h3 {
@@ -1066,7 +1058,7 @@ main,
   height: 360px;
   margin: 0 0 2rem;
   overflow: hidden;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0px;
   box-shadow: var(--shadow);
   transition: opacity 0.2s ease;
   will-change: opacity;
