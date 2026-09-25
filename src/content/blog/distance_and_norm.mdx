@@ -1,0 +1,158 @@
+---
+title: '距离和范数'
+description: ''
+pubDate: 2026-09-17
+category: '数学'
+tags: ['math']
+draft: false
+featured: false
+---
+
+import Note from '/src/components/Note.astro';
+
+## 距离空间 (Metric Space)
+
+在介绍距离空间之前, 我们需要知道为什么我们需要抽象出距离的概念. 日常生活中的距离往往只是表示两个物体之间有多远, 而数学中抽象出的距离则可以用于度量两个元素的远近. 例如我们可以用距离来描述两张图片有多像、两个概率分布的相似度这些没有空间位置概念的东西. 
+
+欧几里得空间 (Euclidean space) $\mathbb{R}^n$ 由所有形如 $\boldsymbol{x}=(x_1,x_2, \cdots, x_n)^\mathrm{T}$ 的 $n$ 维向量构成. 对于任意两点 $\boldsymbol{x}, \boldsymbol{y} \in \mathbb{R}^n$, 我们可以定义其距离为
+$$
+    d(\boldsymbol{x}, \boldsymbol{y}) = \left( \sum_{i=1}^{n} {(x_i-y_i)^2} \right)^{1/2}
+$$
+
+当 $n=3$ 的时候, 这就是我们非常熟悉的三维直角坐标系中两点距离的计算公式. 实际上, 对于一个非空集合 $X$ 和任意 $x,y,z \in X$, 如果有这样一个映射 $d : X \times X \to \mathbb{R}$ 满足
+
+1. (非负性) $d(x,y) \geq 0$ ,  $d(x,y) = 0$ 当且仅当 $x = y$ 
+2. (对称性) $d(x,y) = d(y,x)$ 
+3. (三角不等式) $d(x,y) \leq d(x,z) + d(z,y)$ 
+
+那么我们就称 $d(x,y) $ 是 $x,y$ 之间的距离, 并称 $X$ 是以 $d$ 为距离的距离空间, 记作 $(X,d)$ . 
+
+设 $X = \mathbb{R} ^ n$ , 对任意 $\boldsymbol{x},\boldsymbol{y} \in \mathbb{R} ^n$, 定义
+
+$$
+d_1(\boldsymbol{x},\boldsymbol{y}) = \sum_{i=1}^{n}{\vert x_i - y_i \vert},
+\quad d_2(\boldsymbol{x},\boldsymbol{y}) = \left(\sum_{i=1}^{n}{(x_i - y_i)^2}\right)^{1/2},
+\quad d_\infty(\boldsymbol{x},\boldsymbol{y}) = \max_{i}{\vert x_i -y_i \vert},
+$$
+
+那么 $(\mathbb{R}^n, d_1),(\mathbb{R}^n, d_2),(\mathbb{R}^n, d_\infty)$ 都是距离空间.
+
+对于 $1 \leq p \lt +\infty$, 记
+$$
+\begin{array}{c}
+    \displaystyle l^p=\left\{ \boldsymbol{x} : \boldsymbol{x} = (x_1, x_2, \cdots, x_i, \cdots)^\mathrm{T}, \sum_{i=1}^{+\infty} \vert x_i \vert ^p \lt \infty \right\}, \\
+    \displaystyle l^\infty=\left\{ \boldsymbol{x} : \boldsymbol{x} = (x_1, x_2, \cdots, x_i, \cdots)^\mathrm{T}, \sup_{i} \vert x_i \vert \lt \infty \right\},
+\end{array}
+$$
+定义
+$$
+\begin{array}{c}
+    \displaystyle d_p(\boldsymbol{x},\boldsymbol{y}) =\left\{ \sum_{i=1}^{+\infty} {\vert x_i - y_i \vert ^p} \right\} ^{1/p}, \\
+    \displaystyle d_\infty(\boldsymbol{x},\boldsymbol{y}) = \sup_{i} \vert x_i - y_i \vert ,
+\end{array}
+$$
+
+那么 $(l^p, d_p)$ 和 $(l^\infty, d_\infty)$ 都是距离空间. 
+
+特别的, 对于一个非空集合 $X$ 和这样的一个距离
+
+$$
+d(x,y) = \left\{ 
+    \begin{array}{l}
+        1, x \neq y, \\
+        0, x = y.
+    \end{array}
+\right.
+$$
+
+那么 $(X,d)$ 是一个距离空间, 此时我们称空间 $(X,d)$ 为离散距离空间.
+
+### 距离空间上的极限概念
+
+和实数集 $\mathbb{R}$ 上有数列极限一样, 距离空间上也有类似的极限概念.
+
+设 $\{x_n\}$ 是距离空间 $(X,d)$ 中的点列, $x_0 \in X$ 为一个确定的点. 如果 $\forall \varepsilon > 0 $, $ \exists N \in \mathbb{N}$ 使得当 $n > N$ 时有 $d(x_n, x_0) < \varepsilon $ , 那么我们说点列 $\{x_n\}$ 收敛于 $x_0$.  
+
+记作
+$$
+\displaystyle \lim_{n\to \infty} x_n = x_0
+$$
+
+或者
+
+$$
+x_n \to x_0 (n \to +\infty).
+$$
+
+### 可分性/完备性/列紧性
+
+设 $(X,d)$ 为一距离空间, $A$, $B$ 为 $X$ 的子集.若对任意 $y \in B$ 以及 $\varepsilon > 0$, 都存在 $x \in A$ 使得 $d(x,y) < \varepsilon$ 那么称 $A$ 在 $B$ 中稠密.
+
+<Note>
+如果度量空间 $X$ 存在一个可数的稠密子集, 那么称 $X$ 是**可分的**.
+</Note>
+
+对于距离空间 $(X,d)$ 中的点列 $\{x_n\} $ , 如果 $\forall \varepsilon > 0 $, $ \exists N \in \mathbb{N}$ 使得当 $m,n > N$ 时有 $d(x_m, x_n) < \varepsilon $, 那么我们说点列 $\{x_n\}$ 为柯西列(Cauchy sequence).
+
+<Note>
+如果 $X$ 中的所有柯西列都在 $X$ 中收敛, 那么我们就说 $X$ 是**完备的**.
+</Note>
+
+设 $(X,d)$ 为一距离空间, 点 $x_0 \in X$ 和 $r > 0$.  
+集合 $\{ x \in X:d(x_0, x) < r\}$ 为 $x_0$ 的 $r$ 领域, 记为 $B(x_0, r)$;  
+集合 $\{x\in X: d(x_0,x) \leq r\}$ 为以 $x_0$ 为中心, $r$ 为半径的闭球, 记作 $\overline{B}(x_0,r)$.  
+对于$A \subset X$, 若存在 $x_0$ 的 $r$ 领域 $B(x_0,r) \subset A$ , 则称 $x_0$ 是 $A$ 的内点;  
+如果 $x_0$ 的任何领域 $B(x_0,r)$ 都含有 $A -\{x_0\}$的点, 即$B(x_0,r) \bigcap (A-\{x_0\}) \neq \varnothing$, 则称 $x_0$ 是 $A$ 的聚点;  
+如果 $A$ 中的所有点都是 $A$ 的内点, 则称 $A$ 为开集;  
+如果 $A$ 中的每一聚点都属于 $A$ , 则称 $A$ 为闭集;  
+称 $A$ 与 $A$ 的所有聚点集的并集为 $A$ 的闭包, 记作 $\overline A$. 
+
+基于以上, 介绍列紧的概念
+
+<Note>
+设 $A$ 是距离空间 $(X,d)$ 上的一个子集, 如果 $A$ 中的任何点列都含有子列收敛到 $X$ 中的点, 那么 $A$ 是**列紧的**;  
+如果 $A$ 中的任何点列都含有子列收敛到 $A$ 中的点, 那么 $A$ 是**自列紧的**, 若 $X$ 是列紧的, 则称 $X$ 为列紧距离空间. 
+</Note>
+
+
+## 范数(Norm)
+
+
+## 附录
+
+### 可数集(Countable set)
+
+当一个集合的元素有限的时候, 描述集合元素的数量是自然的. 但是当集合元素数量是无限的时候, 如何描述集合元素数量就成为了一个需要探讨的内容.
+
+假设 $A$ 和 $B$ 是两个集合, 如果存在一个从 $A$ 到 $B$ 的双射, 那么我们就称 $A$ 与 $B$ 等势, 记作 $A \sim B$.
+
+例如 $A=\{\mathrm{全体偶数}\}$, $\mathbb{Z}$ 表示整数集, 令
+$$
+    T: A \to \mathbb{Z}, \quad Tx=\frac{1}{2}x,
+$$
+那么 $T$ 是从 $A$ 到 $\mathbb{Z}$ 的双射, 从而有 $A \sim \mathbb{Z}$.
+
+<Note>
+与自然数集 $\mathbb{N}$ 等势的集合即为**可数集**, 不与 $\mathbb{N}$ 等势的无限集称为**不可数集**.
+</Note>
+
+可数个可数集的并仍然是可数集. 假设 $\{A_n:n\in \mathbb{N}\}$ 为一列可数集, 并假定 $A_n \bigcap A_m = \varnothing (n \neq m)$, 那么
+
+$$
+\begin{array}{c}
+A_1 = \{a_{11},a_{12},a_{13},a_{14},\cdots{} \}, \\
+A_2 = \{a_{21},a_{22},a_{23},a_{24},\cdots{} \}, \\
+A_3 = \{a_{31},a_{32},a_{33},a_{34},\cdots{} \}, \\
+\cdots
+\end{array}
+$$
+
+依照对角线原则, 可以把 $\displaystyle \bigcup_{n=1}^{\infty}A_n$ 中的所有元素排列为:
+
+$$
+a_{11}, a_{21}, a_{12}, a_{31}, a_{22}, a_{13}, a_{41}, \cdots{},  
+$$
+
+因此 $\displaystyle \bigcup_{n=1}^{\infty}A_n$ 是可数集.
+
+非常有趣的是, 使用这个结论我们可以得到一个反直觉的结论: 有理数集 $\mathbb{Q}$ 其实是一个可数集. 由于每个有理数都可以表示为既约分数 $p/q$, 规定 $q \in \mathbb{N}$ . 对于每个 $q$ , 有 $A_q = \{p/q : p \in \mathbb{Z} \}$为一个可数集 , 则 $\displaystyle \mathbb{Q} = \bigcup_{q=1}^{\infty} A_q $ 也为可数集. 
