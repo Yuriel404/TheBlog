@@ -14,7 +14,7 @@ export const siteConfig = {
     { title: '关于', href: '/about' },
   ],
   social: [
-    { title: 'GitHub', href: 'https://github.com/simpleClover' },
+    { title: 'GitHub', href: 'https://github.com/yuriel404' },
     { title: 'Email', href: 'mailto:h404notfound@outlook.com' },
     { title: 'QQ', href: 'https://qm.qq.com/q/wrRqURl93W' },
   ],
